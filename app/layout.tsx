@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PredictX",
-  description: "PredictX is a platform to predict crypto prices",
+  title: "HabitsX",
+  description: "Better habits gamified",
 };
 
 export default function RootLayout({
