@@ -14,3 +14,72 @@ datasource db {
   url      = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+enum FrequencyType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum HabitCategory {
+  FITNESS
+  LEARNING
+  READING
+  WORK
+  HEALTH
+  SOCIAL
+  CREATIVITY
+  FINANCE
+  OTHER
+}
+
+enum HabitStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+model User {
+  id        String   @id @default(uuid()) // uuid is a unique identifier for each user
+  email     String   @unique // unique constraint on the email column
+  name      String?  // name is optional
+
+  habits    Habit[] // One user can have many habits
+
+  createdAt DateTime @default(now()) // default when the user signs up
+  updatedAt DateTime @updatedAt // last time the user info changed
+
+}
+
+model Habit {
+  id        String   @id @default(uuid()) // unique ID for each habit
+  title     String                  // e.g. Daily coding exercice
+  description String?               // Optional description
+  category    String                // fitness, sports, learning, reading, etc.
+
+  // frequency system
+  frequencyType   String            // daily, weekly, monthly, yearly
+  targetCount     Int  @default(1)  // how many times to complete the habit
+
+  userId      String                // connection to which user owns this habit, default time 1
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  completions HabitCompletion[]       // track when habits are completed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HabitCompletion {
+  id        String   @id @default(uuid()) // unique ID
+  date      DateTime @db.Date       // which day was it completed
+
+  habitId String                    // which habit was completed
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([habitId, date])         // prevent from completing the same habit twice in a day
+}
